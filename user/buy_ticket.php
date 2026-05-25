@@ -129,30 +129,61 @@ if(isset($_POST['buy'])) {
 
     </div>
 
-    <form method="POST" action="mpesa_payment.php">
+    <form method="POST">
 
-        <label>Number of Tickets</label>
+    <label>M-Pesa Number</label>
 
-        <input
-            type="number"
-            name="quantity"
-            min="1"
-            max="<?php echo $event['available_tickets']; ?>"
-            required
-        >
-        <input
-    type="text"
-    name="phone"
-    placeholder="Enter M-Pesa Number e.g 254712345678"
-    required
->
-        <button type="submit" name="buy">
-    Pay with M-Pesa
-        </button>
+    <input
+        type="text"
+        name="phone"
+        placeholder="Enter M-Pesa Number e.g 254712345678"
+        required
+    >
 
-    </form>
+    <label>Number of Tickets</label>
+
+    <input
+        type="number"
+        id="quantity"
+        name="quantity"
+        min="1"
+        max="<?php echo $event['available_tickets']; ?>"
+        required
+    >
+
+    <label>Total Amount</label>
+
+    <input
+        type="text"
+        id="total"
+        readonly
+    >
+
+    <button type="submit" name="buy">
+        Pay with M-Pesa
+    </button>
+
+</form>
 
 </div>
+<script>
 
+const quantityInput = document.getElementById('quantity');
+
+const totalInput = document.getElementById('total');
+
+const ticketPrice = <?php echo $event['ticket_price']; ?>;
+
+quantityInput.addEventListener('input', function() {
+
+    let quantity = this.value;
+
+    let total = quantity * ticketPrice;
+
+    totalInput.value = "KSH " + total;
+
+});
+
+</script>
 </body>
 </html>
