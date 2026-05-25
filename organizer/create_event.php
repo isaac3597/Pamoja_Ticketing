@@ -36,10 +36,17 @@ if(isset($_POST['create'])) {
             )";
 
     if(mysqli_query($conn, $sql)) {
-        echo "Event created successfully";
-    } else {
-        echo "Error creating event";
-    }
+
+    // Destroy session
+    session_destroy();
+
+    // Redirect to login page
+    header('Location: ../auth/login.php');
+    exit();
+
+} else {
+    echo "Error creating event";
+}
 }
 ?>
 
