@@ -108,7 +108,39 @@ $result = mysqli_query($conn, $sql);
     <link rel="stylesheet" href="../assets/style.css">
 </head>
 <body>
+<script>
 
+const darkBtn =
+    document.getElementById('darkModeBtn');
+
+// Load saved mode
+if(localStorage.getItem('darkMode') === 'enabled') {
+
+    document.body.classList.add('dark-mode');
+}
+
+darkBtn.addEventListener('click', () => {
+
+    document.body.classList.toggle('dark-mode');
+
+    // Save mode
+    if(document.body.classList.contains('dark-mode')) {
+
+        localStorage.setItem(
+            'darkMode',
+            'enabled'
+        );
+
+    } else {
+
+        localStorage.setItem(
+            'darkMode',
+            'disabled'
+        );
+    }
+});
+
+</script>
 
 
 </body>

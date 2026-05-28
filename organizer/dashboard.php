@@ -54,6 +54,38 @@ if(!isset($_SESSION['user_id']) || $_SESSION['role'] != 'organizer') {
     🌙 Dark Mode
 </button>
 </div>
+<script>
 
+const darkBtn =
+    document.getElementById('darkModeBtn');
+
+// Load saved mode
+if(localStorage.getItem('darkMode') === 'enabled') {
+
+    document.body.classList.add('dark-mode');
+}
+
+darkBtn.addEventListener('click', () => {
+
+    document.body.classList.toggle('dark-mode');
+
+    // Save mode
+    if(document.body.classList.contains('dark-mode')) {
+
+        localStorage.setItem(
+            'darkMode',
+            'enabled'
+        );
+
+    } else {
+
+        localStorage.setItem(
+            'darkMode',
+            'disabled'
+        );
+    }
+});
+
+</script>
 </body>
 </html>
