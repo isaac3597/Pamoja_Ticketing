@@ -66,17 +66,19 @@ if($quantity > $available)
 
         // Insert ticket
         $insert = "INSERT INTO tickets(
-                        user_id,
-                        event_id,
-                        quantity,
-                        total_price
-                    )
-                    VALUES(
-                        '$user_id',
-                        '$event_id',
-                        '$quantity',
-                        '$total_price'
-                    )";
+                user_id,
+                event_id,
+                quantity,
+                total_price,
+                ticket_type
+            )
+            VALUES(
+                '$user_id',
+                '$event_id',
+                '$quantity',
+                '$total_price',
+                '$ticket_type'
+            )";
 
         if(mysqli_query($conn, $insert)) {
 
@@ -238,9 +240,19 @@ STATUS: AUTHORISED
         </p>
 
         <p>
-            <strong>Tickets Left:</strong>
-            <?php echo $event['available_tickets']; ?>
-        </p>
+    <strong>Regular Tickets:</strong>
+    <?php echo $event['regular_tickets']; ?>
+</p>
+
+<p>
+    <strong>VIP Tickets:</strong>
+    <?php echo $event['vip_tickets']; ?>
+</p>
+
+<p>
+    <strong>VVIP Tickets:</strong>
+    <?php echo $event['vvip_tickets']; ?>
+</p>
 
     </div>
 
@@ -296,13 +308,12 @@ STATUS: AUTHORISED
         <label>Number of Tickets</label>
 
         <input
-            type="number"
-            id="quantity"
-            name="quantity"
-            min="1"
-            max="<?php echo $event['available_tickets']; ?>"
-            required
-        >
+    type="number"
+    id="quantity"
+    name="quantity"
+    min="1"
+    required
+>
 
         <label>Total Amount</label>
 

@@ -100,9 +100,19 @@ $result = mysqli_query($conn, $sql);
             </p>
 
             <p>
-                <strong>Available Tickets:</strong>
-                <?php echo $row['available_tickets']; ?>
-            </p>
+    <strong>Regular Tickets:</strong>
+    <?php echo $row['regular_tickets']; ?>
+</p>
+
+<p>
+    <strong>VIP Tickets:</strong>
+    <?php echo $row['vip_tickets']; ?>
+</p>
+
+<p>
+    <strong>VVIP Tickets:</strong>
+    <?php echo $row['vvip_tickets']; ?>
+</p>
 
             <p>
                 <strong>Tickets Sold:</strong>

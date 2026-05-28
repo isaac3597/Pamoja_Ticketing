@@ -75,16 +75,15 @@ $pdf->Cell(
 $pdf->Ln(10);
 
 // Table Header
-$pdf->Cell(10,10,'#',1);
+$pdf->Cell(40,10,'Name',1);
 
-$pdf->Cell(50,10,'Name',1);
+$pdf->Cell(50,10,'Email',1);
 
-$pdf->Cell(60,10,'Email',1);
+$pdf->Cell(30,10,'Class',1);
 
-$pdf->Cell(30,10,'Tickets',1);
+$pdf->Cell(20,10,'Qty',1);
 
 $pdf->Cell(40,10,'Amount',1);
-
 $pdf->Ln();
 
 $count = 1;
@@ -93,18 +92,20 @@ while($row = mysqli_fetch_assoc($result)) {
 
     $pdf->Cell(10,10,$count,1);
 
-    $pdf->Cell(50,10,$row['fullname'],1);
+    $pdf->Cell(40,10,$row['fullname'],1);
 
-    $pdf->Cell(60,10,$row['email'],1);
+$pdf->Cell(50,10,$row['email'],1);
 
-    $pdf->Cell(30,10,$row['quantity'],1);
+$pdf->Cell(30,10,$row['ticket_type'],1);
 
-    $pdf->Cell(
-        40,
-        10,
-        'KSH '.$row['total_price'],
-        1
-    );
+$pdf->Cell(20,10,$row['quantity'],1);
+
+$pdf->Cell(
+    40,
+    10,
+    'KSH '.$row['total_price'],
+    1
+);
 
     $pdf->Ln();
 

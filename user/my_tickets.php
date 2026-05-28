@@ -74,6 +74,10 @@ $result = mysqli_query($conn, $sql);
                     <strong>Tickets Bought:</strong>
                     <?php echo $row['quantity']; ?>
                 </p>
+                <p>
+    <strong>Ticket Class:</strong>
+    <?php echo $row['ticket_type']; ?>
+         </p>
 
                 <p>
                     <strong>Total Paid:</strong>
