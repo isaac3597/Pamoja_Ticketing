@@ -50,6 +50,9 @@ if(!isset($_SESSION['user_id']) || $_SESSION['role'] != 'organizer') {
 <a href="manage_events.php">
     Manage Events
 </a>
+<button id="darkModeBtn">
+    🌙 Dark Mode
+</button>
 </div>
 
 </body>

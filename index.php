@@ -15,6 +15,10 @@
     <a href="auth/register.php">Register</a>
     <a href="user/events.php">Events</a>
     <a href="user/my_tickets.php">My Tickets</a>
+
+    <button id="darkModeBtn">
+    🌙 Dark Mode
+</button>
 </div>
 
 </body>

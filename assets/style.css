@@ -1,3 +1,63 @@
+/* DARK MODE */
+#darkModeBtn{
+    padding:6px 12px;
+    font-size:13px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    width:auto;
+    height:auto;
+}
+
+body.dark-mode{
+    background:#0f172a;
+    color:white;
+}
+
+body.dark-mode .container{
+    background:#111827;
+}
+
+body.dark-mode .event-card{
+    background:#1e293b;
+    color:white;
+    box-shadow:0 0 15px rgba(0,0,0,0.5);
+}
+
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select{
+    background:#334155;
+    color:white;
+    border:1px solid #475569;
+}
+
+body.dark-mode .navbar{
+    background:#020617;
+}
+
+body.dark-mode .navbar a{
+    color:white;
+}
+
+body.dark-mode button{
+    background:#2563eb;
+    color:white;
+}
+
+body.dark-mode table{
+    background:#1e293b;
+    color:white;
+}
+
+body.dark-mode th{
+    background:#0f172a;
+}
+
+body.dark-mode td{
+    border-color:#334155;
+}
+
 *{
     margin:0;
     padding:0;

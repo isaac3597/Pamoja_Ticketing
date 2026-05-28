@@ -45,7 +45,9 @@ $result = mysqli_query($conn, $sql);
         <a href="../auth/logout.php">
             Logout
         </a>
-
+      <button id="darkModeBtn">
+    🌙 Dark Mode
+</button>
     </div>
 
     <h1>Manage My Events</h1>
