@@ -1,18 +1,25 @@
 <?php
 session_start();
-echo $_SESSION['role'];
 
-include '../config/db.php';
+if (!isset($_SESSION['role'])) {
 
-if(!isset($_SESSION['user_id'])) {
-    header('Location: ../auth/login.php');
+    header("Location: ../login.php");
     exit();
 }
 
-if($_SESSION['role'] != 'admin') {
-    exit('Access Denied');
-}
+if ($_SESSION['role'] != 'admin') {
 
+    echo "Access Denied";
+    exit();
+}
+?>
+<?php
+session_start();
+
+print_r($_SESSION);
+?>
+
+<?
 $sql = "SELECT * FROM users
         WHERE role='organizer'
         AND status='pending'";

@@ -11,9 +11,8 @@ if(isset($_POST['login'])) {
 
     $password = trim($_POST['password']);
 
-    $sql = "SELECT * FROM users
-            WHERE email='$email'
-            AND password='$password'";
+    // Find user by email
+    $sql = "SELECT * FROM users WHERE email='$email'";
 
     $result = mysqli_query($conn, $sql);
 
@@ -21,45 +20,34 @@ if(isset($_POST['login'])) {
 
         $user = mysqli_fetch_assoc($result);
 
-        // Organizer approval check
-        if(
-            $user['role'] == 'organizer'
-            &&
-            $user['status'] != 'approved'
-        ) {
+        // Verify password
+        if(password_verify($password, $user['password'])) {
 
-            $error =
-                "Organizer account pending approval";
-
-        } else {
-
-            // Save sessions
             $_SESSION['user_id'] = $user['id'];
 
             $_SESSION['role'] = $user['role'];
 
-            // REDIRECTS
+            $_SESSION['fullname'] = $user['fullname'];
+
+            // Redirect by role
             if($user['role'] == 'admin') {
 
-                header(
-                    "Location: ../admin/dashboard.php"
-                );
-                exit();
+                header("Location: ../admin/dashboard.php");
 
             } elseif($user['role'] == 'organizer') {
 
-                header(
-                    "Location: ../organizer/dashboard.php"
-                );
-                exit();
+                header("Location: ../organizer/dashboard.php");
 
             } else {
 
-                header(
-                    "Location: ../user/events.php"
-                );
-                exit();
+                header("Location: ../user/events.php");
             }
+
+            exit();
+
+        } else {
+
+            $error = "Invalid email or password";
         }
 
     } else {
