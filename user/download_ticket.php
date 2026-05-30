@@ -87,6 +87,15 @@ $pdf->Cell(
     60,
     5,
     'Class: '.$row['ticket_type'],
+    $pdf->SetX(6);
+
+$pdf->Cell(
+    60,
+    5,
+    'Seat: '.$row['seat_number'],
+    0,
+    1
+);
     0,
     1
 );

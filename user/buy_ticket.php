@@ -25,7 +25,7 @@ if(isset($_POST['buy'])) {
     $quantity = $_POST['quantity'];
 
     $user_id = $_SESSION['user_id'];
-
+    $seat_number = $_POST['seat_number'];
     // Determine ticket price
     if($ticket_type == "Regular") {
 
@@ -68,16 +68,18 @@ if($quantity > $available)
         $insert = "INSERT INTO tickets(
                 user_id,
                 event_id,
+                ticket_type,
                 quantity,
                 total_price,
-                ticket_type
+                seat_number
             )
             VALUES(
                 '$user_id',
                 '$event_id',
+                '$ticket_type',
                 '$quantity',
                 '$total_price',
-                '$ticket_type'
+                '$seat_number'
             )";
 
         if(mysqli_query($conn, $insert)) {
@@ -306,7 +308,45 @@ STATUS: AUTHORISED
         >
 
         <label>Number of Tickets</label>
+        <label>Select Seat</label>
 
+<select name="seat_number" required>
+
+    <option value="">
+        Choose Seat
+    </option>
+
+    <?php
+
+    $seats = [
+        "A1","A2","A3","A4","A5",
+        "B1","B2","B3","B4","B5",
+        "C1","C2","C3","C4","C5"
+    ];
+
+    foreach($seats as $seat) {
+
+        // CHECK IF ALREADY BOOKED
+        $checkSeat = mysqli_query(
+            $conn,
+            "SELECT * FROM tickets
+             WHERE event_id='$event_id'
+             AND seat_number='$seat'"
+        );
+
+        if(mysqli_num_rows($checkSeat) == 0) {
+
+            echo "
+            <option value='$seat'>
+                $seat
+            </option>
+            ";
+        }
+    }
+
+    ?>
+
+</select><br><br>
         <input
     type="number"
     id="quantity"

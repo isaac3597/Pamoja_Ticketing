@@ -104,6 +104,10 @@ $result = mysqli_query($conn, $sql);
                 <!-- TICKET CLASS -->
                 <p>
                     <strong>Ticket Class:</strong>
+                    <p>
+    <strong>Seat Number:</strong>
+    <?php echo $row['seat_number']; ?>
+</p>
                     <?php echo $row['ticket_type']; ?>
                 </p>
 
