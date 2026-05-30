@@ -1,15 +1,20 @@
+```php
 <?php
 session_start();
 
 include '../config/db.php';
 
+// CHECK LOGIN
 if(!isset($_SESSION['user_id'])) {
+
     header('Location: ../auth/login.php');
+
     exit();
 }
 
 $event_id = $_GET['id'];
 
+// FETCH EVENT
 $sql = "SELECT * FROM events WHERE id='$event_id'";
 
 $result = mysqli_query($conn, $sql);
@@ -25,139 +30,170 @@ if(isset($_POST['buy'])) {
     $quantity = $_POST['quantity'];
 
     $user_id = $_SESSION['user_id'];
-    $seat_number = $_POST['seat_number'];
-    // Determine ticket price
-    if($ticket_type == "Regular") {
 
-        $price = $event['regular_price'];
+    // MULTIPLE SEATS
+    $seat_numbers =
+        $_POST['seat_number'] ?? [];
 
-    } elseif($ticket_type == "VIP") {
+    // VALIDATE SEATS
+    if(count($seat_numbers) != $quantity) {
 
-        $price = $event['vip_price'];
-
-    } else {
-
-        $price = $event['vvip_price'];
-    }
-
-    // Total
-    $total_price = $price * $quantity;
-
-    // Check ticket availability
-  if($ticket_type == "Regular") {
-
-    $available = $event['regular_tickets'];
-
-} elseif($ticket_type == "VIP") {
-
-    $available = $event['vip_tickets'];
-
-} else {
-
-    $available = $event['vvip_tickets'];
-}
-
-if($quantity > $available) 
-        {
-
-        $error = "Not enough tickets available";
+        $error =
+            "Please select seats equal to ticket quantity";
 
     } else {
 
-        // Insert ticket
-        $insert = "INSERT INTO tickets(
-                user_id,
-                event_id,
-                ticket_type,
-                quantity,
-                total_price,
-                seat_number
-            )
-            VALUES(
-                '$user_id',
-                '$event_id',
-                '$ticket_type',
-                '$quantity',
-                '$total_price',
-                '$seat_number'
-            )";
+        // CONVERT ARRAY TO STRING
+        $seat_number =
+            implode(',', $seat_numbers);
 
-        if(mysqli_query($conn, $insert)) {
+        // DETERMINE PRICE + AVAILABLE TICKETS
+        if($ticket_type == "Regular") {
 
-            // Ticket ID
-            $ticket_id = mysqli_insert_id($conn);
+            $price =
+                $event['regular_price'];
 
-            // Generate pass
-            $pass_code = "PASS-" . rand(100000,999999);
+            $available =
+                $event['regular_tickets'];
 
-            // QR data
-            $qr_data = "
+        } elseif($ticket_type == "VIP") {
+
+            $price =
+                $event['vip_price'];
+
+            $available =
+                $event['vip_tickets'];
+
+        } else {
+
+            $price =
+                $event['vvip_price'];
+
+            $available =
+                $event['vvip_tickets'];
+        }
+
+        // TOTAL PRICE
+        $total_price =
+            $price * $quantity;
+
+        // CHECK AVAILABLE TICKETS
+        if($quantity > $available) {
+
+            $error =
+                "Not enough tickets available";
+
+        } else {
+
+            // INSERT TICKET
+            $insert = "INSERT INTO tickets(
+                            user_id,
+                            event_id,
+                            ticket_type,
+                            quantity,
+                            total_price,
+                            seat_number
+                        )
+                        VALUES(
+                            '$user_id',
+                            '$event_id',
+                            '$ticket_type',
+                            '$quantity',
+                            '$total_price',
+                            '$seat_number'
+                        )";
+
+            if(mysqli_query($conn, $insert)) {
+
+                // GET TICKET ID
+                $ticket_id =
+                    mysqli_insert_id($conn);
+
+                // GENERATE PASS CODE
+                $pass_code =
+                    "PASS-" .
+                    rand(100000,999999);
+
+                // QR DATA
+                $qr_data = "
 EVENT: {$event['title']}
 TYPE: {$ticket_type}
+SEATS: {$seat_number}
 TICKET ID: {$ticket_id}
 USER ID: {$user_id}
 PASS: {$pass_code}
 STATUS: AUTHORISED
 ";
 
-            // QR Library
-            include '../phpqrcode/qrlib.php';
+                // QR LIBRARY
+                include '../phpqrcode/qrlib.php';
 
-            // QR File
-            $file_name = 'ticket_'.$ticket_id.'.png';
+                // QR FILE
+                $file_name =
+                    'ticket_'.$ticket_id.'.png';
 
-            $file_path = '../assets/qrcodes/'.$file_name;
+                $file_path =
+                    '../assets/qrcodes/'.$file_name;
 
-            // Generate QR
-            QRcode::png($qr_data, $file_path);
+                // GENERATE QR
+                QRcode::png(
+                    $qr_data,
+                    $file_path
+                );
 
-            // Save QR code
-            mysqli_query($conn, "
-                UPDATE tickets
-                SET qr_code='$file_name'
-                WHERE id='$ticket_id'
-            ");
+                // SAVE QR
+                mysqli_query($conn, "
+                    UPDATE tickets
+                    SET qr_code='$file_name'
+                    WHERE id='$ticket_id'
+                ");
 
-            // Update remaining tickets
-            if($ticket_type == "Regular") {
+                // UPDATE REMAINING TICKETS
+                if($ticket_type == "Regular") {
 
-    $remaining =
-        $event['regular_tickets'] - $quantity;
+                    $remaining =
+                        $event['regular_tickets']
+                        - $quantity;
 
-    mysqli_query($conn, "
-        UPDATE events
-        SET regular_tickets='$remaining'
-        WHERE id='$event_id'
-    ");
+                    mysqli_query($conn, "
+                        UPDATE events
+                        SET regular_tickets='$remaining'
+                        WHERE id='$event_id'
+                    ");
 
-} elseif($ticket_type == "VIP") {
+                } elseif($ticket_type == "VIP") {
 
-    $remaining =
-        $event['vip_tickets'] - $quantity;
+                    $remaining =
+                        $event['vip_tickets']
+                        - $quantity;
 
-    mysqli_query($conn, "
-        UPDATE events
-        SET vip_tickets='$remaining'
-        WHERE id='$event_id'
-    ");
+                    mysqli_query($conn, "
+                        UPDATE events
+                        SET vip_tickets='$remaining'
+                        WHERE id='$event_id'
+                    ");
 
-} else {
+                } else {
 
-    $remaining =
-        $event['vvip_tickets'] - $quantity;
+                    $remaining =
+                        $event['vvip_tickets']
+                        - $quantity;
 
-    mysqli_query($conn, "
-        UPDATE events
-        SET vvip_tickets='$remaining'
-        WHERE id='$event_id'
-    ");
-}
+                    mysqli_query($conn, "
+                        UPDATE events
+                        SET vvip_tickets='$remaining'
+                        WHERE id='$event_id'
+                    ");
+                }
 
-            $success = "Ticket purchased successfully";
+                $success =
+                    "Ticket purchased successfully";
 
-        } else {
+            } else {
 
-            $error = "Error purchasing ticket";
+                $error =
+                    "Error purchasing ticket";
+            }
         }
     }
 }
@@ -170,7 +206,10 @@ STATUS: AUTHORISED
 
     <title>Buy Ticket</title>
 
-    <link rel="stylesheet" href="../assets/style.css">
+    <link
+        rel="stylesheet"
+        href="../assets/style.css"
+    >
 
 </head>
 
@@ -178,6 +217,7 @@ STATUS: AUTHORISED
 
 <div class="container">
 
+    <!-- NAVBAR -->
     <div class="navbar">
 
         <a href="../index.php">
@@ -200,6 +240,7 @@ STATUS: AUTHORISED
 
     <h1>Buy Ticket</h1>
 
+    <!-- SUCCESS -->
     <?php if(isset($success)) { ?>
 
         <div class="success">
@@ -208,6 +249,7 @@ STATUS: AUTHORISED
 
     <?php } ?>
 
+    <!-- ERROR -->
     <?php if(isset($error)) { ?>
 
         <div class="error">
@@ -216,6 +258,7 @@ STATUS: AUTHORISED
 
     <?php } ?>
 
+    <!-- EVENT CARD -->
     <div class="event-card">
 
         <img
@@ -242,22 +285,23 @@ STATUS: AUTHORISED
         </p>
 
         <p>
-    <strong>Regular Tickets:</strong>
-    <?php echo $event['regular_tickets']; ?>
-</p>
+            <strong>Regular Tickets:</strong>
+            <?php echo $event['regular_tickets']; ?>
+        </p>
 
-<p>
-    <strong>VIP Tickets:</strong>
-    <?php echo $event['vip_tickets']; ?>
-</p>
+        <p>
+            <strong>VIP Tickets:</strong>
+            <?php echo $event['vip_tickets']; ?>
+        </p>
 
-<p>
-    <strong>VVIP Tickets:</strong>
-    <?php echo $event['vvip_tickets']; ?>
-</p>
+        <p>
+            <strong>VVIP Tickets:</strong>
+            <?php echo $event['vvip_tickets']; ?>
+        </p>
 
     </div>
 
+    <!-- FORM -->
     <form method="POST">
 
         <label>Ticket Type</label>
@@ -308,55 +352,26 @@ STATUS: AUTHORISED
         >
 
         <label>Number of Tickets</label>
-        </select><br><br>
+
         <input
-    type="number"
-    id="quantity"
-    name="quantity"
-    min="1"
-    required
->
+            type="number"
+            id="quantity"
+            name="quantity"
+            min="1"
+            required
+        >
 
-        <label>Select Seat</label>
+        <!-- SEAT SELECTION -->
+        <label>Select Seats</label>
 
-<select name="seat_number" required>
+        <div
+            class="seat-container"
+            id="seatContainer"
+        >
 
-    <option value="">
-        Choose Seat
-    </option>
+        </div>
 
-    <?php
-
-    $seats = [
-        "A1","A2","A3","A4","A5",
-        "B1","B2","B3","B4","B5",
-        "C1","C2","C3","C4","C5"
-    ];
-
-    foreach($seats as $seat) {
-
-        // CHECK IF ALREADY BOOKED
-        $checkSeat = mysqli_query(
-            $conn,
-            "SELECT * FROM tickets
-             WHERE event_id='$event_id'
-             AND seat_number='$seat'"
-        );
-
-        if(mysqli_num_rows($checkSeat) == 0) {
-
-            echo "
-            <option value='$seat'>
-                $seat
-            </option>
-            ";
-        }
-    }
-
-    ?>
-
-
-
+        <!-- TOTAL -->
         <label>Total Amount</label>
 
         <input
@@ -382,6 +397,7 @@ STATUS: AUTHORISED
 
 </div>
 
+<!-- JAVASCRIPT -->
 <script>
 
 const quantityInput =
@@ -393,13 +409,23 @@ const totalInput =
 const ticketType =
     document.getElementById('ticket_type');
 
+const seatContainer =
+    document.getElementById(
+        'seatContainer'
+    );
+
+// CALCULATE TOTAL
 function calculateTotal() {
 
     const selectedOption =
-        ticketType.options[ticketType.selectedIndex];
+        ticketType.options[
+            ticketType.selectedIndex
+        ];
 
     const price =
-        selectedOption.getAttribute('data-price');
+        selectedOption.getAttribute(
+            'data-price'
+        );
 
     const quantity =
         quantityInput.value;
@@ -407,11 +433,15 @@ function calculateTotal() {
     const total =
         price * quantity;
 
-    totalInput.value = "KSH " + total;
+    totalInput.value =
+        "KSH " + total;
 
-    document.getElementById('amount').value = total;
+    document.getElementById(
+        'amount'
+    ).value = total;
 }
 
+// EVENTS
 quantityInput.addEventListener(
     'input',
     calculateTotal
@@ -420,6 +450,102 @@ quantityInput.addEventListener(
 ticketType.addEventListener(
     'change',
     calculateTotal
+);
+
+// BOOKED SEATS
+const bookedSeats = <?php
+
+$booked = [];
+
+$getBooked = mysqli_query(
+    $conn,
+    "SELECT seat_number
+     FROM tickets
+     WHERE event_id='$event_id'"
+);
+
+while($seat = mysqli_fetch_assoc($getBooked)) {
+
+    $seatArray =
+        explode(',', $seat['seat_number']);
+
+    foreach($seatArray as $s) {
+
+        $booked[] = trim($s);
+    }
+}
+
+echo json_encode($booked);
+
+?>;
+
+// SEAT GROUPS
+const regularSeats = [
+    'C1','C2','C3','C4','C5',
+    'D1','D2','D3','D4','D5'
+];
+
+const vipSeats = [
+    'B1','B2','B3','B4','B5'
+];
+
+const vvipSeats = [
+    'A1','A2','A3','A4','A5'
+];
+
+// LOAD SEATS
+function loadSeats() {
+
+    seatContainer.innerHTML = '';
+
+    let seats = [];
+
+    const type =
+        ticketType.value;
+
+    if(type === 'Regular') {
+
+        seats = regularSeats;
+
+    } else if(type === 'VIP') {
+
+        seats = vipSeats;
+
+    } else if(type === 'VVIP') {
+
+        seats = vvipSeats;
+    }
+
+    seats.forEach(seat => {
+
+        // SKIP BOOKED
+        if(bookedSeats.includes(seat)) {
+
+            return;
+        }
+
+        seatContainer.innerHTML += `
+
+        <label class="seat-box">
+
+            <input
+                type="checkbox"
+                name="seat_number[]"
+                value="${seat}"
+            >
+
+            ${seat}
+
+        </label>
+
+        `;
+    });
+}
+
+// LOAD WHEN TYPE CHANGES
+ticketType.addEventListener(
+    'change',
+    loadSeats
 );
 
 </script>
