@@ -479,18 +479,36 @@ echo json_encode($booked);
 ?>;
 
 // SEAT GROUPS
-const regularSeats = [
-    'C1','C2','C3','C4','C5',
-    'D1','D2','D3','D4','D5'
-];
+// GENERATE SEATS DYNAMICALL
+// GENERATE SEATS DYNAMICALLY
+function generateSeats(prefix, total) {
 
-const vipSeats = [
-    'B1','B2','B3','B4','B5'
-];
+    let seats = [];
 
-const vvipSeats = [
-    'A1','A2','A3','A4','A5'
-];
+    for(let i = 1; i <= total; i++) {
+
+        seats.push(prefix + i);
+    }
+
+    return seats;
+}
+
+// TOTAL SEATS FROM DATABASE
+const regularSeats = generateSeats(
+    'R',
+    <?php echo (int)$event['regular_tickets']; ?>
+);
+
+const vipSeats = generateSeats(
+    'V',
+    <?php echo (int)$event['vip_tickets']; ?>
+);
+
+const vvipSeats = generateSeats(
+    'VV',
+    <?php echo (int)$event['vvip_tickets']; ?>
+);
+
 
 // LOAD SEATS
 function loadSeats() {
