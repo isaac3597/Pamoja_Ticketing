@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Event Management System</title>
+    <title>Pamoja Ticketing System</title>
     <link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
 </head>
 <body>
 
-<h1>Welcome to Event Management System</h1>
+<h1>Welcome to Pamoja Ticketing System</h1>
 
 <div class="navbar">
     <link rel="stylesheet" href="assets/style.css">
