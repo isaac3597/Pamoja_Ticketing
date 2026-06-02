@@ -5,6 +5,7 @@ include '../config/db.php';
 if(isset($_POST['create'])) {
 
     $title = $_POST['title'];
+    $organizer = $_POST['organizer'];
     $description = $_POST['description'];
     $location = $_POST['location'];
     $event_date = $_POST['event_date'];
@@ -34,6 +35,7 @@ move_uploaded_file($tmp_name, $folder);
   $sql = "INSERT INTO events(
             organizer_id,
             title,
+            organizer,
             description,
             location,
             event_date,
@@ -48,6 +50,7 @@ move_uploaded_file($tmp_name, $folder);
         VALUES(
             '$organizer_id',
             '$title',
+            '$organizer',
             '$description',
             '$location',
             '$event_date',
@@ -101,8 +104,11 @@ move_uploaded_file($tmp_name, $folder);
     accept="image/*"
     required
 ><br><br>
-
-    <input 
+    <div class="form-group">
+    <label></label>
+    <input type="text" name="organizer" placeholder="Organizer Name"  class="form-control" required>
+</div>  
+<input 
         type="text" 
         name="title" 
         placeholder="Event Title" 
