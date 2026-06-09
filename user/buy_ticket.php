@@ -30,9 +30,7 @@ if(isset($_POST['buy'])) {
 
     $user_id = $_SESSION['user_id'];
 
-    // MULTIPLE SEATS
-    $seat_numbers =
-        $_POST['seat_number'] ?? [];
+    $seat_numbers = $_POST['seat_number'] ?? [];
 
     // VALIDATE SEATS
     if(count($seat_numbers) != $quantity) {
@@ -42,45 +40,35 @@ if(isset($_POST['buy'])) {
 
     } else {
 
-        // CONVERT ARRAY TO STRING
         $seat_number =
             implode(',', $seat_numbers);
 
         // DETERMINE PRICE + AVAILABLE TICKETS
         if($ticket_type == "Regular") {
 
-            $price =
-                $event['regular_price'];
+            $price = $event['regular_price'];
 
-            $available =
-                $event['regular_tickets'];
+            $available = $event['regular_tickets'];
 
         } elseif($ticket_type == "VIP") {
 
-            $price =
-                $event['vip_price'];
+            $price = $event['vip_price'];
 
-            $available =
-                $event['vip_tickets'];
+            $available = $event['vip_tickets'];
 
         } else {
 
-            $price =
-                $event['vvip_price'];
+            $price = $event['vvip_price'];
 
-            $available =
-                $event['vvip_tickets'];
+            $available = $event['vvip_tickets'];
         }
 
-        // TOTAL PRICE
-        $total_price =
-            $price * $quantity;
+        $total_price = $price * $quantity;
 
         // CHECK AVAILABLE TICKETS
         if($quantity > $available) {
 
-            $error =
-                "Not enough tickets available";
+            $error = "Not enough tickets available";
 
         } else {
 
@@ -104,14 +92,12 @@ if(isset($_POST['buy'])) {
 
             if(mysqli_query($conn, $insert)) {
 
-                // GET TICKET ID
                 $ticket_id =
                     mysqli_insert_id($conn);
 
-                // GENERATE PASS CODE
+                // PASS CODE
                 $pass_code =
-                    "PASS-" .
-                    rand(100000,999999);
+                    "PASS-" . rand(100000,999999);
 
                 // QR DATA
                 $qr_data = "
@@ -124,17 +110,14 @@ PASS: {$pass_code}
 STATUS: AUTHORISED
 ";
 
-                // QR LIBRARY
                 include '../phpqrcode/qrlib.php';
 
-                // QR FILE
                 $file_name =
                     'ticket_'.$ticket_id.'.png';
 
                 $file_path =
                     '../assets/qrcodes/'.$file_name;
 
-                // GENERATE QR
                 QRcode::png(
                     $qr_data,
                     $file_path
@@ -199,374 +182,812 @@ STATUS: AUTHORISED
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>Buy Ticket</title>
 
-    <link
-        rel="stylesheet"
-        href="../assets/style.css"
-    >
+    <!-- GOOGLE FONT -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FONT AWESOME -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Poppins', sans-serif;
+        }
+
+        body{
+            background:#f4f7ff;
+            min-height:100vh;
+            transition:0.3s;
+        }
+
+        /* NAVBAR */
+
+        .navbar{
+            width:100%;
+            background:#4f46e5;
+            padding:18px 40px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            flex-wrap:wrap;
+            box-shadow:0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo{
+            color:white;
+            font-size:24px;
+            font-weight:700;
+        }
+
+        .nav-links{
+            display:flex;
+            gap:15px;
+            flex-wrap:wrap;
+        }
+
+        .nav-links a,
+        .nav-links button{
+            text-decoration:none;
+            background:white;
+            color:#4f46e5;
+            padding:10px 18px;
+            border:none;
+            border-radius:8px;
+            font-size:14px;
+            font-weight:600;
+            transition:0.3s;
+            cursor:pointer;
+        }
+
+        .nav-links a:hover,
+        .nav-links button:hover{
+            background:#e0e7ff;
+        }
+
+        /* PAGE */
+
+        .container{
+            max-width:1200px;
+            margin:40px auto;
+            padding:20px;
+        }
+
+        .page-title{
+            text-align:center;
+            margin-bottom:30px;
+        }
+
+        .page-title h1{
+            font-size:40px;
+            color:#111827;
+        }
+
+        .page-title p{
+            color:#6b7280;
+            margin-top:10px;
+        }
+
+        /* GRID */
+
+        .content-grid{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:30px;
+        }
+
+        /* EVENT CARD */
+
+        .event-card{
+            background:white;
+            border-radius:20px;
+            overflow:hidden;
+            box-shadow:0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .event-image{
+            width:100%;
+            height:300px;
+            object-fit:cover;
+        }
+
+        .event-content{
+            padding:25px;
+        }
+
+        .event-content h2{
+            color:#111827;
+            margin-bottom:15px;
+            font-size:28px;
+        }
+
+        .event-content p{
+            margin-bottom:12px;
+            color:#4b5563;
+            line-height:1.7;
+        }
+
+        /* FORM */
+
+        .form-card{
+            background:white;
+            padding:30px;
+            border-radius:20px;
+            box-shadow:0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .form-card h2{
+            margin-bottom:25px;
+            color:#111827;
+        }
+
+        .input-group{
+            margin-bottom:20px;
+        }
+
+        .input-group label{
+            display:block;
+            margin-bottom:8px;
+            color:#374151;
+            font-weight:500;
+        }
+
+        .input-group input,
+        .input-group select{
+            width:100%;
+            padding:14px;
+            border:1px solid #d1d5db;
+            border-radius:10px;
+            outline:none;
+            transition:0.3s;
+            font-size:15px;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus{
+            border-color:#4f46e5;
+            box-shadow:0 0 5px rgba(79,70,229,0.3);
+        }
+
+        /* ALERTS */
+
+        .success{
+            background:#dcfce7;
+            color:#166534;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:20px;
+        }
+
+        .error{
+            background:#fee2e2;
+            color:#991b1b;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:20px;
+        }
+
+        /* SEATS */
+
+        .seat-container{
+            display:flex;
+            flex-wrap:wrap;
+            gap:12px;
+            margin-top:10px;
+        }
+
+        .seat-box{
+            background:#eef2ff;
+            border:2px solid transparent;
+            padding:12px 18px;
+            border-radius:10px;
+            cursor:pointer;
+            font-weight:600;
+            transition:0.3s;
+        }
+
+        .seat-box:hover{
+            background:#c7d2fe;
+        }
+
+        .seat-box input{
+            display:none;
+        }
+
+        .seat-box input:checked + span{
+            color:#4f46e5;
+        }
+
+        /* TOTAL */
+
+        .total-box{
+            background:#eef2ff;
+            padding:20px;
+            border-radius:12px;
+            margin-top:20px;
+            text-align:center;
+        }
+
+        .total-box h3{
+            color:#4f46e5;
+            margin-bottom:10px;
+        }
+
+        .total-price{
+            font-size:30px;
+            font-weight:700;
+            color:#111827;
+        }
+
+        /* BUTTON */
+
+        .buy-btn{
+            width:100%;
+            background:#4f46e5;
+            color:white;
+            border:none;
+            padding:15px;
+            border-radius:10px;
+            font-size:16px;
+            font-weight:600;
+            margin-top:25px;
+            cursor:pointer;
+            transition:0.3s;
+        }
+
+        .buy-btn:hover{
+            background:#4338ca;
+        }
+
+        /* DARK MODE */
+
+        .dark-mode{
+            background:#111827;
+            color:white;
+        }
+
+        .dark-mode .navbar{
+            background:#0f172a;
+        }
+
+        .dark-mode .event-card,
+        .dark-mode .form-card{
+            background:#1f2937;
+        }
+
+        .dark-mode .event-content h2,
+        .dark-mode .form-card h2,
+        .dark-mode .page-title h1{
+            color:white;
+        }
+
+        .dark-mode .event-content p,
+        .dark-mode .page-title p,
+        .dark-mode .input-group label{
+            color:#d1d5db;
+        }
+
+        .dark-mode .input-group input,
+        .dark-mode .input-group select{
+            background:#374151;
+            color:white;
+            border:1px solid #4b5563;
+        }
+
+        .dark-mode .total-price{
+            color:white;
+        }
+
+        .dark-mode .seat-box{
+            background:#374151;
+        }
+
+        .dark-mode .total-box{
+            background:#312e81;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width:900px){
+
+            .content-grid{
+                grid-template-columns:1fr;
+            }
+        }
+
+        @media(max-width:768px){
+
+            .navbar{
+                padding:20px;
+                flex-direction:column;
+                gap:15px;
+            }
+
+            .container{
+                padding:15px;
+            }
+
+            .page-title h1{
+                font-size:30px;
+            }
+        }
+
+    </style>
 
 </head>
 
 <body>
 
-<div class="container">
-
     <!-- NAVBAR -->
+
     <div class="navbar">
 
-        <a href="../index.php">
-            Home
-        </a>
+        <div class="logo">
+            <i class="fa-solid fa-ticket"></i>
+            Pamoja Ticketing
+        </div>
 
-        <a href="events.php">
-            Events
-        </a>
+        <div class="nav-links">
 
-        <a href="my_tickets.php">
-            My Tickets
-        </a>
+            <a href="../index.php">
+                <i class="fa-solid fa-house"></i>
+                Home
+            </a>
 
-        <a href="../auth/logout.php">
-            Logout
-        </a>
+            <a href="events.php">
+                <i class="fa-solid fa-calendar-days"></i>
+                Events
+            </a>
+
+            <a href="my_tickets.php">
+                <i class="fa-solid fa-ticket-simple"></i>
+                My Tickets
+            </a>
+
+            <a href="../auth/logout.php">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </a>
+
+            <button id="darkModeBtn">
+                🌙 Dark Mode
+            </button>
+
+        </div>
 
     </div>
 
-    <h1>Buy Ticket</h1>
+    <!-- PAGE -->
 
-    <!-- SUCCESS -->
-    <?php if(isset($success)) { ?>
+    <div class="container">
 
-        <div class="success">
-            <?php echo $success; ?>
+        <div class="page-title">
+
+            <h1>Buy Event Ticket</h1>
+
+            <p>
+                Secure your seat and enjoy the event experience.
+            </p>
+
         </div>
 
-    <?php } ?>
+        <?php if(isset($success)) { ?>
 
-    <!-- ERROR -->
-    <?php if(isset($error)) { ?>
+            <div class="success">
+                <?php echo $success; ?>
+            </div>
 
-        <div class="error">
-            <?php echo $error; ?>
+        <?php } ?>
+
+        <?php if(isset($error)) { ?>
+
+            <div class="error">
+                <?php echo $error; ?>
+            </div>
+
+        <?php } ?>
+
+        <div class="content-grid">
+
+            <!-- EVENT DETAILS -->
+
+            <div class="event-card">
+
+                <img
+                    src="../assets/uploads/<?php echo $event['image']; ?>"
+                    class="event-image"
+                >
+
+                <div class="event-content">
+
+                    <h2>
+                        <?php echo $event['title']; ?>
+                    </h2>
+
+                    <p>
+                        <?php echo $event['description']; ?>
+                    </p>
+
+                    <p>
+                        <strong>📍 Location:</strong>
+                        <?php echo $event['location']; ?>
+                    </p>
+
+                    <p>
+                        <strong>📅 Date:</strong>
+                        <?php echo $event['event_date']; ?>
+                    </p>
+
+                    <p>
+                        <strong>🎫 Regular Tickets:</strong>
+                        <?php echo $event['regular_tickets']; ?>
+                    </p>
+
+                    <p>
+                        <strong>⭐ VIP Tickets:</strong>
+                        <?php echo $event['vip_tickets']; ?>
+                    </p>
+
+                    <p>
+                        <strong>👑 VVIP Tickets:</strong>
+                        <?php echo $event['vvip_tickets']; ?>
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- BUY FORM -->
+
+            <div class="form-card">
+
+                <h2>Ticket Purchase</h2>
+
+                <form method="POST">
+
+                    <div class="input-group">
+
+                        <label>Ticket Type</label>
+
+                        <select
+                            name="ticket_type"
+                            id="ticket_type"
+                            required
+                        >
+
+                            <option value="">
+                                Select Ticket Type
+                            </option>
+
+                            <option
+                                value="Regular"
+                                data-price="<?php echo $event['regular_price']; ?>"
+                            >
+                                Regular -
+                                KSH <?php echo $event['regular_price']; ?>
+                            </option>
+
+                            <option
+                                value="VIP"
+                                data-price="<?php echo $event['vip_price']; ?>"
+                            >
+                                VIP -
+                                KSH <?php echo $event['vip_price']; ?>
+                            </option>
+
+                            <option
+                                value="VVIP"
+                                data-price="<?php echo $event['vvip_price']; ?>"
+                            >
+                                VVIP -
+                                KSH <?php echo $event['vvip_price']; ?>
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label>M-Pesa Number</label>
+
+                        <input
+                            type="text"
+                            name="phone"
+                            placeholder="254712345678"
+                            required
+                        >
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label>Number of Tickets</label>
+
+                        <input
+                            type="number"
+                            id="quantity"
+                            name="quantity"
+                            min="1"
+                            required
+                        >
+
+                    </div>
+
+                    <!-- SEATS -->
+
+                    <div class="input-group">
+
+                        <label>Select Seats</label>
+
+                        <div
+                            class="seat-container"
+                            id="seatContainer"
+                        >
+
+                        </div>
+
+                    </div>
+
+                    <!-- TOTAL -->
+
+                    <div class="total-box">
+
+                        <h3>Total Amount</h3>
+
+                        <div
+                            class="total-price"
+                            id="total"
+                        >
+                            KSH 0
+                        </div>
+
+                    </div>
+
+                    <input
+                        type="hidden"
+                        name="amount"
+                        id="amount"
+                    >
+
+                    <button
+                        type="submit"
+                        name="buy"
+                        class="buy-btn"
+                    >
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                        Pay with M-Pesa
+                    </button>
+
+                </form>
+
+            </div>
+
         </div>
-
-    <?php } ?>
-
-    <!-- EVENT CARD -->
-    <div class="event-card">
-
-        <img
-            src="../assets/uploads/<?php echo $event['image']; ?>"
-            class="event-image"
-        >
-
-        <h2>
-            <?php echo $event['title']; ?>
-        </h2>
-
-        <p>
-            <?php echo $event['description']; ?>
-        </p>
-
-        <p>
-            <strong>Location:</strong>
-            <?php echo $event['location']; ?>
-        </p>
-
-        <p>
-            <strong>Date:</strong>
-            <?php echo $event['event_date']; ?>
-        </p>
-
-        <p>
-            <strong>Regular Tickets:</strong>
-            <?php echo $event['regular_tickets']; ?>
-        </p>
-
-        <p>
-            <strong>VIP Tickets:</strong>
-            <?php echo $event['vip_tickets']; ?>
-        </p>
-
-        <p>
-            <strong>VVIP Tickets:</strong>
-            <?php echo $event['vvip_tickets']; ?>
-        </p>
 
     </div>
 
-    <!-- FORM -->
-    <form method="POST">
+    <!-- JAVASCRIPT -->
 
-        <label>Ticket Type</label>
+    <script>
 
-        <select
-            name="ticket_type"
-            id="ticket_type"
-            required
-        >
+        const quantityInput =
+            document.getElementById('quantity');
 
-            <option value="">
-                Select Ticket Type
-            </option>
+        const totalInput =
+            document.getElementById('total');
 
-            <option
-                value="Regular"
-                data-price="<?php echo $event['regular_price']; ?>"
-            >
-                Regular -
-                KSH <?php echo $event['regular_price']; ?>
-            </option>
+        const ticketType =
+            document.getElementById('ticket_type');
 
-            <option
-                value="VIP"
-                data-price="<?php echo $event['vip_price']; ?>"
-            >
-                VIP -
-                KSH <?php echo $event['vip_price']; ?>
-            </option>
+        const seatContainer =
+            document.getElementById(
+                'seatContainer'
+            );
 
-            <option
-                value="VVIP"
-                data-price="<?php echo $event['vvip_price']; ?>"
-            >
-                VVIP -
-                KSH <?php echo $event['vvip_price']; ?>
-            </option>
+        // TOTAL
+        function calculateTotal() {
 
-        </select>
+            const selectedOption =
+                ticketType.options[
+                    ticketType.selectedIndex
+                ];
 
-        <label>M-Pesa Number</label>
+            const price =
+                selectedOption.getAttribute(
+                    'data-price'
+                );
 
-        <input
-            type="text"
-            name="phone"
-            placeholder="254712345678"
-            required
-        >
+            const quantity =
+                quantityInput.value;
 
-        <label>Number of Tickets</label>
+            const total =
+                price * quantity;
 
-        <input
-            type="number"
-            id="quantity"
-            name="quantity"
-            min="1"
-            required
-        >
+            totalInput.innerHTML =
+                "KSH " + total;
 
-        <!-- SEAT SELECTION -->
-        <label>Select Seats</label>
-
-        <div
-            class="seat-container"
-            id="seatContainer"
-        >
-
-        </div>
-
-        <!-- TOTAL -->
-        <label>Total Amount</label>
-
-        <input
-            type="hidden"
-            name="amount"
-            id="amount"
-        >
-
-        <input
-            type="text"
-            id="total"
-            readonly
-        >
-
-        <button
-            type="submit"
-            name="buy"
-        >
-            Pay with M-Pesa
-        </button>
-
-    </form>
-
-</div>
-
-<!-- JAVASCRIPT -->
-<script>
-
-const quantityInput =
-    document.getElementById('quantity');
-
-const totalInput =
-    document.getElementById('total');
-
-const ticketType =
-    document.getElementById('ticket_type');
-
-const seatContainer =
-    document.getElementById(
-        'seatContainer'
-    );
-
-// CALCULATE TOTAL
-function calculateTotal() {
-
-    const selectedOption =
-        ticketType.options[
-            ticketType.selectedIndex
-        ];
-
-    const price =
-        selectedOption.getAttribute(
-            'data-price'
-        );
-
-    const quantity =
-        quantityInput.value;
-
-    const total =
-        price * quantity;
-
-    totalInput.value =
-        "KSH " + total;
-
-    document.getElementById(
-        'amount'
-    ).value = total;
-}
-
-// EVENTS
-quantityInput.addEventListener(
-    'input',
-    calculateTotal
-);
-
-ticketType.addEventListener(
-    'change',
-    calculateTotal
-);
-
-// BOOKED SEATS
-const bookedSeats = <?php
-
-$booked = [];
-
-$getBooked = mysqli_query(
-    $conn,
-    "SELECT seat_number
-     FROM tickets
-     WHERE event_id='$event_id'"
-);
-
-while($seat = mysqli_fetch_assoc($getBooked)) {
-
-    $seatArray =
-        explode(',', $seat['seat_number']);
-
-    foreach($seatArray as $s) {
-
-        $booked[] = trim($s);
-    }
-}
-
-echo json_encode($booked);
-
-?>;
-
-// SEAT GROUPS
-// GENERATE SEATS DYNAMICALL
-// GENERATE SEATS DYNAMICALLY
-function generateSeats(prefix, total) {
-
-    let seats = [];
-
-    for(let i = 1; i <= total; i++) {
-
-        seats.push(prefix + i);
-    }
-
-    return seats;
-}
-
-// TOTAL SEATS FROM DATABASE
-const regularSeats = generateSeats(
-    'R',
-    <?php echo (int)$event['regular_tickets']; ?>
-);
-
-const vipSeats = generateSeats(
-    'V',
-    <?php echo (int)$event['vip_tickets']; ?>
-);
-
-const vvipSeats = generateSeats(
-    'VV',
-    <?php echo (int)$event['vvip_tickets']; ?>
-);
-
-
-// LOAD SEATS
-function loadSeats() {
-
-    seatContainer.innerHTML = '';
-
-    let seats = [];
-
-    const type =
-        ticketType.value;
-
-    if(type === 'Regular') {
-
-        seats = regularSeats;
-
-    } else if(type === 'VIP') {
-
-        seats = vipSeats;
-
-    } else if(type === 'VVIP') {
-
-        seats = vvipSeats;
-    }
-
-    seats.forEach(seat => {
-
-        // SKIP BOOKED
-        if(bookedSeats.includes(seat)) {
-
-            return;
+            document.getElementById(
+                'amount'
+            ).value = total;
         }
 
-        seatContainer.innerHTML += `
+        quantityInput.addEventListener(
+            'input',
+            calculateTotal
+        );
 
-        <label class="seat-box">
+        ticketType.addEventListener(
+            'change',
+            calculateTotal
+        );
 
-            <input
-                type="checkbox"
-                name="seat_number[]"
-                value="${seat}"
-            >
+        // BOOKED SEATS
+        const bookedSeats = <?php
 
-            ${seat}
+        $booked = [];
 
-        </label>
+        $getBooked = mysqli_query(
+            $conn,
+            "SELECT seat_number
+             FROM tickets
+             WHERE event_id='$event_id'"
+        );
 
-        `;
-    });
-}
+        while($seat = mysqli_fetch_assoc($getBooked)) {
 
-// LOAD WHEN TYPE CHANGES
-ticketType.addEventListener(
-    'change',
-    loadSeats
-);
+            $seatArray =
+                explode(',', $seat['seat_number']);
 
-</script>
+            foreach($seatArray as $s) {
+
+                $booked[] = trim($s);
+            }
+        }
+
+        echo json_encode($booked);
+
+        ?>;
+
+        // GENERATE SEATS
+        function generateSeats(prefix, total) {
+
+            let seats = [];
+
+            for(let i = 1; i <= total; i++) {
+
+                seats.push(prefix + i);
+            }
+
+            return seats;
+        }
+
+        const regularSeats = generateSeats(
+            'R',
+            <?php echo (int)$event['regular_tickets']; ?>
+        );
+
+        const vipSeats = generateSeats(
+            'V',
+            <?php echo (int)$event['vip_tickets']; ?>
+        );
+
+        const vvipSeats = generateSeats(
+            'VV',
+            <?php echo (int)$event['vvip_tickets']; ?>
+        );
+
+        // LOAD SEATS
+        function loadSeats() {
+
+            seatContainer.innerHTML = '';
+
+            let seats = [];
+
+            const type =
+                ticketType.value;
+
+            if(type === 'Regular') {
+
+                seats = regularSeats;
+
+            } else if(type === 'VIP') {
+
+                seats = vipSeats;
+
+            } else if(type === 'VVIP') {
+
+                seats = vvipSeats;
+            }
+
+            seats.forEach(seat => {
+
+                if(bookedSeats.includes(seat)) {
+
+                    return;
+                }
+
+                seatContainer.innerHTML += `
+
+                <label class="seat-box">
+
+                    <input
+                        type="checkbox"
+                        name="seat_number[]"
+                        value="${seat}"
+                    >
+
+                    <span>${seat}</span>
+
+                </label>
+
+                `;
+            });
+        }
+
+        ticketType.addEventListener(
+            'change',
+            loadSeats
+        );
+
+        // DARK MODE
+        const darkBtn =
+            document.getElementById(
+                'darkModeBtn'
+            );
+
+        if(localStorage.getItem(
+            'darkMode'
+        ) === 'enabled') {
+
+            document.body.classList.add(
+                'dark-mode'
+            );
+        }
+
+        darkBtn.addEventListener(
+            'click',
+            () => {
+
+                document.body.classList.toggle(
+                    'dark-mode'
+                );
+
+                if(document.body.classList.contains(
+                    'dark-mode'
+                )) {
+
+                    localStorage.setItem(
+                        'darkMode',
+                        'enabled'
+                    );
+
+                } else {
+
+                    localStorage.setItem(
+                        'darkMode',
+                        'disabled'
+                    );
+                }
+            }
+        );
+
+    </script>
 
 </body>
 </html>
-```
