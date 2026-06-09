@@ -4,6 +4,7 @@ include '../config/db.php';
 $sql = "SELECT events.*, users.fullname
         FROM events
         JOIN users ON events.organizer_id = users.id
+        WHERE event_date >= CURDATE()
         ORDER BY event_date ASC";
 
 $result = mysqli_query($conn, $sql);
