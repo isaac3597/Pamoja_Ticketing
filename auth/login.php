@@ -253,13 +253,6 @@ if(isset($_POST['login'])) {
         </button>
 
     </form>
-
-    <!-- Administrator Login Button -->
-    <a href="../admin/login.php" class="admin-btn">
-        <i class="fa-solid fa-user-shield"></i>
-        Administrator Login
-    </a>
-
     <div class="extra-links">
 
         <p>
