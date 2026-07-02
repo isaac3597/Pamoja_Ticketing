@@ -366,7 +366,7 @@ while($event=mysqli_fetch_assoc($events)){
 
 <td><?php echo $event['event_date']; ?></td>
 
-<td><?php echo $event['venue']; ?></td>
+<td><?php echo $event['location']; ?></td>
 
 </tr>
 
