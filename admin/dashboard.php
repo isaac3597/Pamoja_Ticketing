@@ -20,7 +20,7 @@ if($user['role'] != 'admin'){
 }
 
 // Dashboard Statistics
-$totalUsers = mysqli_num_rows(mysqli_query($conn,"SELECT * FROM users WHERE role='customer'"));
+$totalUsers = mysqli_num_rows(mysqli_query($conn,"SELECT * FROM users WHERE role='user'"));
 
 $totalOrganizers = mysqli_num_rows(mysqli_query($conn,"SELECT * FROM users WHERE role='organizer'"));
 
