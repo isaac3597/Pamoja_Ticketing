@@ -214,7 +214,7 @@ Login
 
 </form>
 
-<!-- ✅ BACK TO HOME BUTTON ADDED HERE -->
+<!-- HOME BUTTON ADDED HERE -->
 <div class="d-grid mt-3">
 
 <a href="../index.php" class="btn btn-outline-secondary">
