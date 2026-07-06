@@ -1,5 +1,17 @@
 <?php
+session_start();
 include '../config/db.php';
+
+// Logged in user's fullname
+$fullname = "Guest";
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    $userQuery = mysqli_query($conn,"SELECT fullname FROM users WHERE id='$user_id'");
+    if($userQuery && mysqli_num_rows($userQuery)>0){
+        $userData = mysqli_fetch_assoc($userQuery);
+        $fullname = $userData['fullname'];
+    }
+}
 
 $sql = "SELECT events.*, users.fullname
         FROM events
@@ -350,7 +362,12 @@ $result = mysqli_query($conn, $sql);
     <div class="navbar">
 
         <div class="logo">
-            <i class="fa-solid fa-ticket"></i> Pamoja Events
+            <div style="font-size:24px;font-weight:700;">
+                <i class="fa-solid fa-ticket"></i> Pamoja Events
+            </div>
+            <div style="font-size:14px;color:#e0e7ff;margin-top:4px;">
+                Welcome, <?php echo htmlspecialchars($fullname); ?>
+            </div>
         </div>
 
         <div class="nav-links">

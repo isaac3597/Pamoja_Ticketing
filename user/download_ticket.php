@@ -41,35 +41,26 @@ $row = mysqli_fetch_assoc($result);
 $pdf = new FPDF(
     'L',
     'mm',
-    array(120,70)
+    array(130,80)
 );
 
 $pdf->AddPage();
-
+$pdf->SetAutoPageBreak(false);
+$pdf->SetMargins(3,3,3);
 // BORDER
 $pdf->SetDrawColor(0,0,0);
 
 $pdf->Rect(3,3,114,64);
 
 // TITLE
-$pdf->SetFont('Arial','B',16);
-
-$pdf->SetTextColor(0,0,120);
-
-$pdf->Cell(
-    115,
-    8,
-    $row['title'],
-    0,
-    1,
-    'C'
-);
+$pdf->SetFont('Arial','B',13);
+$pdf->Cell(114,7,$row['title'],0,1,'C');
 
 // RESET COLOR
 $pdf->SetTextColor(0,0,0);
 
 // DETAILS
-$pdf->SetFont('Arial','',10);
+$pdf->SetFont('Arial','',9);
 
 // NAME
 $pdf->SetX(6);
@@ -129,18 +120,17 @@ $pdf->Cell(
 // LOCATION
 $pdf->SetX(6);
 
-$pdf->MultiCell(
-    60,
-    5,
-    'Location: '.$row['location']
-);
+$location = substr($row['location'],0,35);
+
+$pdf->SetX(6);
+$pdf->Cell(60,5,'Location: '.$location,0,1);
 
 // AUTHORISED
 $pdf->SetFont('Arial','B',11);
 
 $pdf->SetTextColor(0,120,0);
 
-$pdf->SetXY(6,50);
+$pdf->SetXY(6,46);
 
 $pdf->Cell(
     60,
@@ -170,12 +160,12 @@ $pdf->SetFont('Arial','I',8);
 
 $pdf->SetTextColor(100,100,100);
 
-$pdf->SetXY(6,60);
+$pdf->SetXY(6,56);
 
 $pdf->Cell(
     100,
     5,
-    'Event Management System Ticket',
+    'Pamoja Events Ticketing Management System ',
     0,
     1
 );

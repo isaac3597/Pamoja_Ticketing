@@ -538,9 +538,15 @@ STATUS: AUTHORISED
     <div class="navbar">
 
         <div class="logo">
-            <i class="fa-solid fa-ticket"></i>
-            Pamoja Ticketing
-        </div>
+
+    <div style="font-size:24px;font-weight:700;">
+        <i class="fa-solid fa-ticket"></i>
+        Pamoja Ticketing
+    </div>
+
+   
+
+</div>
 
         <div class="nav-links">
 
@@ -569,9 +575,9 @@ STATUS: AUTHORISED
             </button>
 
         </div>
-
+        
     </div>
-
+    
     <!-- PAGE -->
 
     <div class="container">
