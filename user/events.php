@@ -365,11 +365,12 @@ $result = mysqli_query($conn, $sql);
             <div style="font-size:24px;font-weight:700;">
                 <i class="fa-solid fa-ticket"></i> Pamoja Events
             </div>
-            <div style="font-size:14px;color:#e0e7ff;margin-top:4px;">
-                Welcome, <?php echo htmlspecialchars($fullname); ?>
-            </div>
-        </div>
+            
 
+        </div>
+         <h2>
+                Welcome, <?php echo $_SESSION['fullname']; ?> 👋
+            </h2>
         <div class="nav-links">
 
             <a href="../index.php">

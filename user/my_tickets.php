@@ -364,6 +364,9 @@ $result = mysqli_query($conn, $sql);
             <i class="fa-solid fa-ticket"></i>
             Pamoja Ticketing
         </div>
+         <h2>
+                Welcome, <?php echo $_SESSION['fullname']; ?> 👋
+            </h2>
 
         <div class="nav-links">
 

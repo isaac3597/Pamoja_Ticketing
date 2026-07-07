@@ -180,7 +180,7 @@ content="width=device-width, initial-scale=1">
 
 <title>
 
-Event Report
+Event Report.
 
 </title>
 
@@ -508,8 +508,7 @@ content="width=device-width, initial-scale=1">
 
 <title>
 
-Event Report
-
+Event Report.
 </title>
 
 <link
