@@ -52,7 +52,7 @@ $pdf->AddPage();
 
 $pdf->SetFont('Arial','B',18);
 
-$pdf->Cell(190,10,'Event Report',0,1,'C');
+$pdf->Cell(190,10,'Event Ticket Olders Report',0,1,'C');
 
 $pdf->Ln(5);
 
