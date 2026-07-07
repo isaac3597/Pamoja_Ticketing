@@ -38,137 +38,156 @@ $result = mysqli_query($conn, $sql);
 $row = mysqli_fetch_assoc($result);
 
 // CREATE SMALL RECTANGLE PDF
-$pdf = new FPDF(
-    'L',
-    'mm',
-    array(130,80)
-);
+// CREATE TICKET PDF
+$pdf = new FPDF('L', 'mm', array(130,80));
 
 $pdf->AddPage();
 $pdf->SetAutoPageBreak(false);
-$pdf->SetMargins(3,3,3);
-// BORDER
-$pdf->SetDrawColor(0,0,0);
+$pdf->SetMargins(4,4,4);
 
-$pdf->Rect(3,3,114,64);
+// OUTER BORDER
+$pdf->SetDrawColor(70,70,70);
+$pdf->SetLineWidth(0.5);
+$pdf->Rect(3,3,124,74);
 
-// TITLE
-$pdf->SetFont('Arial','B',13);
-$pdf->Cell(114,7,$row['title'],0,1,'C');
+// ===============================
+// HEADER
+// ===============================
 
-// RESET COLOR
+// Blue Header
+$pdf->SetFillColor(79,70,229);
+$pdf->Rect(3,3,124,15,'F');
+
+// Logo (Font Awesome icon substitute)
+$pdf->SetTextColor(255,255,255);
+$pdf->SetFont('Arial','B',16);
+$pdf->SetXY(6,7);
+$pdf->Cell(60,5,'Pamoja Ticketing',0,0,'L');
+
+$pdf->SetFont('Arial','',8);
+$pdf->SetXY(6,12);
+$pdf->Cell(60,4,'Electronic Event Ticket',0,0,'L');
+
+// ===============================
+// EVENT TITLE
+// ===============================
+
 $pdf->SetTextColor(0,0,0);
 
-// DETAILS
+$pdf->SetFont('Arial','B',14);
+$pdf->SetXY(6,22);
+$pdf->Cell(72,7,$row['title'],0,1);
+
+// ===============================
+// TICKET DETAILS
+// ===============================
+
 $pdf->SetFont('Arial','',9);
 
-// NAME
-$pdf->SetX(6);
+$y = 31;
 
-$pdf->Cell(
-    60,
-    5,
-    'Name: '.$row['fullname'],
-    0,
-    1
-);
+$pdf->SetXY(6,$y);
+$pdf->Cell(30,5,'User Name:');
+$pdf->SetFont('Arial','B',9);
+$pdf->Cell(45,5,$row['fullname']);
 
-// CLASS
-$pdf->SetX(6);
+$pdf->SetFont('Arial','',9);
+$y += 6;
 
-$pdf->Cell(
-    60,
-    5,
-    'Class: '.$row['ticket_type'],
-    0,
-    1
-);
+$pdf->SetXY(6,$y);
+$pdf->Cell(30,5,'Ticket No:');
+$pdf->SetFont('Arial','B',9);
+$pdf->Cell(45,5,'TKT-'.$row['id']);
 
-// SEAT
-$pdf->SetX(6);
+$pdf->SetFont('Arial','',9);
+$y += 6;
 
-$pdf->Cell(
-    60,
-    5,
-    'Seat: '.$row['seat_number'],
-    0,
-    1
-);
+$pdf->SetXY(6,$y);
+$pdf->Cell(30,5,'Ticket Type:');
+$pdf->SetFont('Arial','B',9);
+$pdf->Cell(45,5,$row['ticket_type']);
 
-// QUANTITY
-$pdf->SetX(6);
+$pdf->SetFont('Arial','',9);
+$y += 6;
 
-$pdf->Cell(
-    60,
-    5,
-    'Qty: '.$row['quantity'],
-    0,
-    1
-);
+$pdf->SetXY(6,$y);
+$pdf->Cell(30,5,'Seat Number:');
+$pdf->SetFont('Arial','B',9);
+$pdf->Cell(45,5,$row['seat_number']);
 
-// DATE
-$pdf->SetX(6);
+$pdf->SetFont('Arial','',9);
+$y += 6;
 
-$pdf->Cell(
-    60,
-    5,
-    'Date: '.$row['event_date'],
-    0,
-    1
-);
+$pdf->SetXY(6,$y);
+$pdf->Cell(30,5,'Quantity:');
+$pdf->SetFont('Arial','B',9);
+$pdf->Cell(45,5,$row['quantity']);
 
-// LOCATION
-$pdf->SetX(6);
+$pdf->SetFont('Arial','',9);
+$y += 6;
 
-$location = substr($row['location'],0,35);
+$pdf->SetXY(6,$y);
+$pdf->Cell(30,5,'Event Date:');
+$pdf->SetFont('Arial','B',9);
+$pdf->Cell(45,5,$row['event_date']);
 
-$pdf->SetX(6);
-$pdf->Cell(60,5,'Location: '.$location,0,1);
+$pdf->SetFont('Arial','',9);
+$y += 6;
 
-// AUTHORISED
-$pdf->SetFont('Arial','B',11);
+$pdf->SetXY(6,$y);
+$pdf->Cell(30,5,'Location:');
+$pdf->SetFont('Arial','B',9);
+$pdf->Cell(45,5,substr($row['location'],0,28));
 
-$pdf->SetTextColor(0,120,0);
+// ===============================
+// VALID BADGE
+// ===============================
 
-$pdf->SetXY(6,46);
+$pdf->SetFillColor(34,197,94);
+$pdf->SetTextColor(255,255,255);
 
-$pdf->Cell(
-    60,
-    6,
-    'ACCESS: AUTHORISED',
-    0,
-    1
-);
+$pdf->SetXY(6,68);
+$pdf->Cell(42,7,'VALID TICKET',0,0,'C',true);
 
+// ===============================
 // QR CODE
-$qr =
-    '../assets/qrcodes/'.$row['qr_code'];
+// ===============================
 
-if(file_exists($qr)) {
+$qr = '../assets/qrcodes/'.$row['qr_code'];
 
-    $pdf->Image(
-        $qr,
-        78,
-        18,
-        30,
-        30
-    );
+if(file_exists($qr)){
+
+    $pdf->Image($qr,88,22,30,30);
 }
 
+// QR Caption
+$pdf->SetTextColor(0,0,0);
+$pdf->SetFont('Arial','',8);
+
+$pdf->SetXY(84,54);
+$pdf->Cell(38,5,'Scan at Entrance',0,0,'C');
+
+// ===============================
 // FOOTER
-$pdf->SetFont('Arial','I',8);
+// ===============================
 
-$pdf->SetTextColor(100,100,100);
+$pdf->SetDrawColor(200,200,200);
+$pdf->Line(4,64,126,64);
 
-$pdf->SetXY(6,56);
+$pdf->SetFont('Arial','I',7);
+$pdf->SetTextColor(120,120,120);
 
+$pdf->SetXY(6,66);
 $pdf->Cell(
-    100,
-    5,
-    'Pamoja Events Ticketing Management System ',
+    118,
+    4,
+    'Please present this ticket at the event entrance.',
     0,
-    1
+    0,
+    'C'
 );
+
+
 
 // DOWNLOAD PDF
 $pdf->Output(

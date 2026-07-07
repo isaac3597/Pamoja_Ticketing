@@ -10,7 +10,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Pamoja Ticketing System</title>
+    <title>Pamoja Events Ticketing System</title>
 
     <link
         rel="icon"
@@ -335,7 +335,7 @@
 
             <i class="fa-solid fa-ticket"></i>
 
-            Pamoja Ticketing
+            Pamoja Event Ticketing
 
         </div>
 
@@ -380,9 +380,8 @@
 
             <p>
 
-                Pamoja Ticketing System helps you discover,
-                book, and manage tickets for concerts,
-                conferences, festivals, sports events,
+                Pamoja Events Ticketing System helps you discover and book for tickets for concerts,
+                festivals, sports events,
                 and more — all in one place.
 
             </p>
